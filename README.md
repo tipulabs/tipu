@@ -42,3 +42,4 @@ cargo run
 
 1. <a href="https://github.com/lotabout/tuikit" target="_blank">Tui-Kit</a>
 1. <a href="https://doc.rust-lang.org/std/process/struct.Command.html" target="_blank">Standard Processs</a>
+1. <a href="https://github.com/serde-rs/json" target="_blank">Serde-JSON</a>

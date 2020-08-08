@@ -57,7 +57,7 @@ fn main() {
             _ => {}
         }
 
-        // TODO: Find a way to 
+        // TODO: Find a way to use the selected script inside the central bash
         if script_to_run != "" {
             println!("Shortcut invoked: {}", script_to_run);
             // Command::new(script_to_run).spawn().expect("failed to execute process")

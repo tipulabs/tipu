@@ -29,6 +29,10 @@ fn main() {
     let foo: Value = serde_json::from_str(&buff).unwrap();
     println!("Scripts: {}", foo["scripts"]);
 
+    for (name, obj) in foo["scripts"].as_object().unwrap().iter() {
+        println!("{} is {:?}", name, obj);
+    }
+
     let term = Term::with_height(TermHeight::Percent(70)).unwrap();
     let model = Model("middle!".to_string());
 
@@ -39,8 +43,16 @@ fn main() {
         let _ = term.print(0, 0, "press 'q' to exit");
 
         // TODO: Hide the topmost Window in case package.json is not found
+        // TODO: Intelligently show the buttons based on the number of scripts from package.json
         let vsplit = VSplit::default()
-            .split(Win::new(&model).border(true))
+            .split(
+                HSplit::default()
+                    .basis(Size::Percent(70))
+                    .split(Win::new(&model).border(true).basis(Size::Percent(30)))
+                    .split(Win::new(&model).border(true).basis(Size::Percent(30)))
+                    .split(Win::new(&model).border(true).basis(Size::Percent(30)))
+                    .split(Win::new(&model).border(true).basis(Size::Percent(30)))
+            )
             .split(
                 HSplit::default()
                     .split(Win::new(&model).border(true))

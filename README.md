@@ -2,7 +2,9 @@
 <p align="center">
   <img alt="icon" src="https://i.imgur.com/IhaVgsp.png" width="100" height="100"> 
 </p>
-<p align="center">🌶Spicing the Terminal Experience for JS Developers</a></p>
+<p align="center">🌶Spicing the Terminal Experience for JS Developers </a></p>
+
+[![Run on Repl.it](https://repl.it/badge/github/tipulabs/tipu)](https://repl.it/github/tipulabs/tipu)
 
 ## What we think the problem is
 You are someone who builds for for users on the web, but the command line is something which is widely different and yet you have to use it one way or other.

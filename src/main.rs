@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::Read;
+// use std::process::Command;
 
 use tuikit::prelude::*;
 
@@ -21,6 +22,8 @@ impl Draw for Model {
 impl Widget for Model{}
 
 fn main() {
+    let mut script_to_run = "";
+    let mut window_on_focus = "bash";
     // TODO: Handle panic when package.json
     let mut file = File::open("package.json").unwrap();
     let mut buff = String::new();
@@ -37,10 +40,28 @@ fn main() {
     let model = Model("middle!".to_string());
 
     while let Ok(ev) = term.poll_event() {
-        if let Event::Key(Key::Char('q')) = ev {
-            break;
+        let _ = term.clear();
+        let _ = term.print(0, 0, "press arrow key to move the text, (q) to quit");
+
+        println!("Current Focused Window: {}", window_on_focus);
+
+        match ev {
+            Event::Key(Key::ESC) | Event::Key(Key::Char('q')) => break,
+            Event::Key(Key::Ctrl('w')) => script_to_run = "yarn start",
+            Event::Key(Key::Ctrl('e')) => script_to_run = "yarn build",
+            Event::Key(Key::Ctrl('r')) => script_to_run = "yarn test",
+            Event::Key(Key::Up) => window_on_focus = "script", // scripts
+            Event::Key(Key::Left) => window_on_focus = "bash", // bash
+            Event::Key(Key::Down) => window_on_focus = "chat", // chat
+            Event::Key(Key::Right) => window_on_focus = "session", // shared session
+            _ => {}
         }
-        let _ = term.print(0, 0, "press 'q' to exit");
+
+        // TODO: Find a way to 
+        if script_to_run != "" {
+            println!("Shortcut invoked: {}", script_to_run);
+            // Command::new(script_to_run).spawn().expect("failed to execute process")
+        }
 
         // TODO: Hide the topmost Window in case package.json is not found
         // TODO: Intelligently show the buttons based on the number of scripts from package.json
@@ -66,4 +87,4 @@ fn main() {
         let _ = term.draw(&vsplit);
         let _ = term.present();
     }
- }
+}

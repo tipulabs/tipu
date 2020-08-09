@@ -1,77 +1,107 @@
-use std::thread;
-use std::fs::File;
-use std::time::Duration;
-use std::net::TcpStream;
-use std::sync::mpsc::{self, TryRecvError};
-use std::io::{self, ErrorKind, Read, Write};
+#[macro_use]
+extern crate lazy_static;
 
-use serde_json::{Value};
+mod components;
+mod state;
+#[allow(dead_code)]
+mod util;
 
-const MSG_SIZE: usize = 32;
-const LOCAL: &str = "https://protected-everglades-84717.herokuapp.com:80";
+use crate::components::{
+    app::App, git_window::GitWindow, script_bar::ScriptBar, shared_window::SharedWindow,
+    terminal::Terminal as TerminalComponent,
+};
+use crate::state::{ApplicationFocus, ApplicationState};
+use crate::util::event::{Event, Events};
+use std::{error::Error, io};
+use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
+use tui::{
+    backend::TermionBackend,
+    layout::{Constraint, Direction, Layout},
+    Terminal,
+};
 
-fn thread_sleep() {
-    thread::sleep(Duration::from_millis(120));
-}
+fn main() -> Result<(), Box<dyn Error>> {
+    // Terminal initialization
+    let stdout = io::stdout().into_raw_mode()?;
+    let stdout = MouseTerminal::from(stdout);
+    let stdout = AlternateScreen::from(stdout);
+    let backend = TermionBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
 
-fn main() {
-    // TODO: Handle panic when package.json
-    let mut file = File::open("package.json").unwrap();
-    let mut buff = String::new();
-    file.read_to_string(&mut buff).unwrap();
+    let events = Events::new();
 
-    let foo: Value = serde_json::from_str(&buff).unwrap();
-    println!("Scripts: {}", foo["scripts"]);
+    // Application State
+    let mut app_state = ApplicationState::default();
 
-    for (name, obj) in foo["scripts"].as_object().unwrap().iter() {
-        println!("{} is {:?}", name, obj);
-    }
-
-    let mut client = TcpStream::connect(LOCAL).expect("Stream failed to connect");
-    client
-        .set_nonblocking(true)
-        .expect("Failed to initiate non-blocking");
-
-    let (tx, rx) = mpsc::channel::<String>();
-
-    thread::spawn(move || loop {
-        let mut buff = vec![0; MSG_SIZE];
-        match client.read_exact(&mut buff) {
-            Ok(_) => {
-                let msg = buff.into_iter().take_while(|&x| x != 0).collect::<Vec<_>>();
-                println!("Received message: {:?}", String::from_utf8(msg).unwrap());
-            }
-            Err(ref err) if err.kind() == ErrorKind::WouldBlock => (),
-            Err(_) => {
-                println!("Connection with server lost.");
-                break;
-            }
-        }
-
-        match rx.try_recv() {
-            Ok(msg) => {
-                let mut buffer = msg.clone().into_bytes();
-                buffer.resize(MSG_SIZE, 0);
-                client.write_all(&buffer).expect("Writing to socket failed");
-                println!("Sent message: {:?}", msg);
-            }
-            Err(TryRecvError::Empty) => (),
-            Err(TryRecvError::Disconnected) => break,
-        }
-
-        thread_sleep();
-    });
-
-    println!("Write a Message:");
+    // Main loops
     loop {
-        let mut buff = String::new();
-        io::stdin()
-            .read_line(&mut buff)
-            .expect("Reading from stdin failed.");
-        let msg = buff.trim().to_string();
-        if msg == ":q" || tx.send(msg).is_err() {
-            break;
+        terminal.draw(|f| {
+            // drawing the global borders
+            let window_size = f.size();
+            App::default()
+                .title("Tipu")
+                .size(window_size)
+                .is_focused(false)
+                .render(f);
+
+            // dividing chunks
+            let main_chunk = Layout::default()
+                .direction(Direction::Vertical)
+                .margin(1)
+                .constraints([Constraint::Percentage(25), Constraint::Percentage(75)].as_ref())
+                .split(window_size);
+
+            ScriptBar::default()
+                .size(main_chunk[0])
+                .title("ScriptBar [3]")
+                .is_focused(app_state.current_focus_position == ApplicationFocus::ScriptBar)
+                .render(f);
+
+            // lower_chunk
+            let lower_chunk = Layout::default()
+                .direction(Direction::Horizontal)
+                .margin(1)
+                .constraints([Constraint::Percentage(75), Constraint::Percentage(25)].as_ref())
+                .split(main_chunk[1]);
+
+            // rendering terminal
+            TerminalComponent::default()
+                .size(lower_chunk[0])
+                .title("Terminal [1]")
+                .is_focused(app_state.current_focus_position == ApplicationFocus::Terminal)
+                .render(f);
+
+            // lower right chunk
+            let lower_right_chunk = Layout::default()
+                .direction(Direction::Vertical)
+                .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
+                .split(lower_chunk[1]);
+            // chat window
+            SharedWindow::default()
+                .size(lower_right_chunk[0])
+                .title("Shared Window [2]")
+                .is_focused(app_state.current_focus_position == ApplicationFocus::Chat)
+                .render(f);
+
+            // git window
+            GitWindow::default()
+                .size(lower_right_chunk[1])
+                .title("Git Window [4]")
+                .is_focused(app_state.current_focus_position == ApplicationFocus::GitChat)
+                .render(f);
+        })?;
+
+        // handling keyboard inputs
+        if let Event::Input(input) = events.next()? {
+            match input {
+                Key::Char('q') => break,
+                Key::Char('2') => app_state.update_focus_state(ApplicationFocus::Chat),
+                Key::Char('3') => app_state.update_focus_state(ApplicationFocus::ScriptBar),
+                Key::Char('1') => app_state.update_focus_state(ApplicationFocus::Terminal),
+                Key::Char('4') => app_state.update_focus_state(ApplicationFocus::GitChat),
+                _ => {}
+            }
         }
     }
-    println!("Exited.");
+    Ok(())
 }

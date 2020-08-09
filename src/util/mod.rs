@@ -1,5 +1,7 @@
 pub mod event;
 
+pub mod parse;
+
 use rand::distributions::{Distribution, Uniform};
 use rand::rngs::ThreadRng;
 use tui::widgets::ListState;

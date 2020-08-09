@@ -1,11 +1,8 @@
 use std::thread;
-use std::fs::File;
 use std::time::Duration;
 use std::net::TcpStream;
 use std::sync::mpsc::{self, TryRecvError};
 use std::io::{self, ErrorKind, Read, Write};
-
-use serde_json::{Value};
 
 const MSG_SIZE: usize = 32;
 const LOCAL: &str = "https://protected-everglades-84717.herokuapp.com:80";
@@ -15,17 +12,6 @@ fn thread_sleep() {
 }
 
 fn main() {
-    // TODO: Handle panic when package.json
-    let mut file = File::open("package.json").unwrap();
-    let mut buff = String::new();
-    file.read_to_string(&mut buff).unwrap();
-
-    let foo: Value = serde_json::from_str(&buff).unwrap();
-    println!("Scripts: {}", foo["scripts"]);
-
-    for (name, obj) in foo["scripts"].as_object().unwrap().iter() {
-        println!("{} is {:?}", name, obj);
-    }
 
     let mut client = TcpStream::connect(LOCAL).expect("Stream failed to connect");
     client

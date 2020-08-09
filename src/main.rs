@@ -8,7 +8,7 @@ use std::io::{self, ErrorKind, Read, Write};
 use serde_json::{Value};
 
 const MSG_SIZE: usize = 32;
-const LOCAL: &str = "127.0.0.1:6000";
+const LOCAL: &str = "https://protected-everglades-84717.herokuapp.com:80";
 
 fn thread_sleep() {
     thread::sleep(Duration::from_millis(120));

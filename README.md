@@ -2,7 +2,7 @@
 <p align="center">
   <img alt="icon" src="https://i.imgur.com/IhaVgsp.png" width="100" height="100"> 
 </p>
-<p align="center">🌶Spicing the Terminal Experience for JS Developers with: : <a href="https://github.com/tipulabs/tipu-serverhttps://github.com/aryaminus/nazar-server" target="_blank">Tipu-Server</a> </a></p>
+<p align="center">🌶Spicing the Terminal Experience for JS Developers with: : <a href="https://github.com/tipulabs/tipu-server" target="_blank">Tipu-Server</a> </a></p>
 
 [![Run on Repl.it](https://repl.it/badge/github/tipulabs/tipu)](https://repl.it/github/tipulabs/tipu)
 

@@ -331,12 +331,14 @@ dependencies = [
 name = "tipu"
 version = "0.1.0"
 dependencies = [
+ "lazy_static",
  "rand",
  "serde",
  "serde_json",
  "termion",
  "tui",
  "tuikit",
+ "unicode-segmentation",
 ]
 
 [[package]]

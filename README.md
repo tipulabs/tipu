@@ -2,7 +2,7 @@
 <p align="center">
   <img alt="icon" src="https://i.imgur.com/IhaVgsp.png" width="100" height="100"> 
 </p>
-<p align="center">🌶Spicing the Terminal Experience for JS Developers </a></p>
+<p align="center">🌶Spicing the Terminal Experience for JS Developers with: : <a href="https://github.com/tipulabs/tipu-serverhttps://github.com/aryaminus/nazar-server" target="_blank">Tipu-Server</a> </a></p>
 
 [![Run on Repl.it](https://repl.it/badge/github/tipulabs/tipu)](https://repl.it/github/tipulabs/tipu)
 
@@ -26,7 +26,7 @@ So, what if there was an addon which handles the scripts and lets you collaborat
 
 ## Installation
 
-Make sure you have [Rust](https://www.rust-lang.org/tools/install) and [Tipu-Server](https://github.com/tipulabs/tipu-server) installed.
+Make sure you have [Rust](https://www.rust-lang.org/tools/install)
 
 Clone the source locally:
 ```
@@ -34,8 +34,22 @@ $ git clone https://github.com/tipulabs/tipu
 $ cd tipu
 ```
 
-Run `tipu`:
+Run `tipu-design`:
 ```
+cargo build
+cargo run
+```
+
+Run `tipu-shell`:
+```
+git checkout feature/shell
+cargo build
+cargo run
+```
+
+Run `tipu-message`:
+```
+git checkout feature/tcpstream
 cargo build
 cargo run
 ```

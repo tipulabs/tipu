@@ -5,4 +5,3 @@ authors = ["aryaminus <sunim.54@gmail.com>", "GauravRajSharma <blazegaurav123@gm
 edition = "2018"
 
 [dependencies]
-serde_json = "*"

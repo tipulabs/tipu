@@ -6,3 +6,8 @@ edition = "2018"
 
 [dependencies]
 tuikit = "*"
+serde_json = "*"
+tui = "0.10"
+termion = "1.0.0"
+rand = "*"
+serde = { version = "1.0", features = ["derive"] }

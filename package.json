@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "start": "react-scripts start",
+    "dev": "react-scripts dev",
+    "lint": "eslint lint",
+    "build": "next build"
+  }
+}

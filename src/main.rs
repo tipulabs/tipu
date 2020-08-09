@@ -1,63 +1,59 @@
-use std::thread;
-use std::time::Duration;
-use std::net::TcpStream;
-use std::sync::mpsc::{self, TryRecvError};
-use std::io::{self, ErrorKind, Read, Write};
+#[macro_use]
+extern crate lazy_static;
 
-const MSG_SIZE: usize = 32;
-const LOCAL: &str = "https://protected-everglades-84717.herokuapp.com:80";
+mod parse;
 
-fn thread_sleep() {
-    thread::sleep(Duration::from_millis(120));
+use std::io::{self, Write};
+use std::process::{self, Command};
+
+
+// TODO: instead of working directly with path and args after parsing, generate a 
+// graph of tasks to execute and then execute them
+fn main() {
+    let mut input = String::new();
+    loop {
+        print!("$ ");
+        io::stdout().flush().unwrap();
+        match io::stdin().read_line(&mut input) {
+            Ok(0) => break,
+            Ok(_) => if let Some((path, args)) = eval_input(input.trim()) {
+                exec_input(&path, args.iter().map(AsRef::as_ref).collect());
+            },
+            Err(_) => process::exit(1),
+        }
+        input.clear();
+    }
+    println!("Bye!");
 }
 
-fn main() {
 
-    let mut client = TcpStream::connect(LOCAL).expect("Stream failed to connect");
-    client
-        .set_nonblocking(true)
-        .expect("Failed to initiate non-blocking");
+fn eval_input(input: &str) -> Option<(String, Vec<String>)> {
+    match parse::parse(input) {
+        Ok(mut expr) => {
+            let args = expr
+                .split_off(1)
+                .iter()
+                .map(|x| x.unwrap())
+                .collect();
+            let path = expr[0].unwrap();
 
-    let (tx, rx) = mpsc::channel::<String>();
-
-    thread::spawn(move || loop {
-        let mut buff = vec![0; MSG_SIZE];
-        match client.read_exact(&mut buff) {
-            Ok(_) => {
-                let msg = buff.into_iter().take_while(|&x| x != 0).collect::<Vec<_>>();
-                println!("Received message: {:?}", String::from_utf8(msg).unwrap());
-            }
-            Err(ref err) if err.kind() == ErrorKind::WouldBlock => (),
-            Err(_) => {
-                println!("Connection with server lost.");
-                break;
-            }
-        }
-
-        match rx.try_recv() {
-            Ok(msg) => {
-                let mut buffer = msg.clone().into_bytes();
-                buffer.resize(MSG_SIZE, 0);
-                client.write_all(&buffer).expect("Writing to socket failed");
-                println!("Sent message: {:?}", msg);
-            }
-            Err(TryRecvError::Empty) => (),
-            Err(TryRecvError::Disconnected) => break,
-        }
-
-        thread_sleep();
-    });
-
-    println!("Write a Message:");
-    loop {
-        let mut buff = String::new();
-        io::stdin()
-            .read_line(&mut buff)
-            .expect("Reading from stdin failed.");
-        let msg = buff.trim().to_string();
-        if msg == ":q" || tx.send(msg).is_err() {
-            break;
-        }
+            Some((path, args))
+        },
+        Err(msg) => {
+            eprintln!("error: {}", msg);
+            None
+        },
     }
-    println!("Exited.");
+}
+
+
+fn exec_input(path: &str, args: Vec<&str>) {
+    match Command::new(path).args(args).spawn() {
+        Ok(mut child) => if let Ok(exit_status) = child.wait() {
+            println!("process exited with code {}", exit_status.code().unwrap_or(0));
+        },
+        Err(e) => {
+            println!("{}", e);
+        },
+    }
 }

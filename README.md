@@ -39,6 +39,7 @@ Run `tipu-design`:
 cargo build
 cargo run
 ```
+![img](https://i.imgur.com/mEJqNks.png)
 
 Run `tipu-shell`:
 ```
@@ -46,6 +47,7 @@ git checkout feature/shell
 cargo build
 cargo run
 ```
+![img](https://i.imgur.com/o3wbOgT.png)
 
 Run `tipu-message`:
 ```
@@ -53,6 +55,7 @@ git checkout feature/tcpstream
 cargo build
 cargo run
 ```
+![img](https://i.imgur.com/QhzJo4q.png)
 
 ## Technologies
 

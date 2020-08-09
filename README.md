@@ -26,7 +26,7 @@ So, what if there was an addon which handles the scripts and lets you collaborat
 
 ## Installation
 
-Make sure you have [Rust](https://www.rust-lang.org/tools/install) installed.
+Make sure you have [Rust](https://www.rust-lang.org/tools/install) and [Tipu-Server](https://github.com/tipulabs/tipu-server) installed.
 
 Clone the source locally:
 ```
@@ -42,6 +42,6 @@ cargo run
 
 ## Technologies
 
-1. <a href="https://github.com/lotabout/tuikit" target="_blank">Tui-Kit</a>
-1. <a href="https://doc.rust-lang.org/std/process/struct.Command.html" target="_blank">Standard Processs</a>
+1. <a href="https://github.com/fdehau/tui-rs" target="_blank">Tui-RS</a>
+1. <a href="https://doc.rust-lang.org/std/net/struct.TcpStream.html" target="_blank">TCP Stream</a>
 1. <a href="https://github.com/serde-rs/json" target="_blank">Serde-JSON</a>

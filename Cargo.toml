@@ -5,3 +5,5 @@ authors = ["aryaminus <sunim.54@gmail.com>", "GauravRajSharma <blazegaurav123@gm
 edition = "2018"
 
 [dependencies]
+unicode-segmentation = "1.6.0"
+lazy_static = "1.4.0"
